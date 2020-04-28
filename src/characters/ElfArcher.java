@@ -3,6 +3,8 @@ package characters;
 import mainFiles.gameConventions.GameFraction;
 import mainFiles.MyMain;
 
+import javax.swing.*;
+
 public class ElfArcher extends Character {
 
     public ElfArcher(MyMain game) {
@@ -14,7 +16,9 @@ public class ElfArcher extends Character {
         spriteHeight = sprites.height;
         spriteWidth = sprites.width;
 
-        hp = 100;
+        icon = new ImageIcon("C:\\myGame\\src\\res\\icons\\archerIco.png").getImage();
+
+        hp = 75;
         speed = 3;
 
         dirX = (int) (Math.random() * 1000) + 700;

@@ -98,17 +98,19 @@ public class Player {
                     && character.dirX + character.spriteWidth < selectedAreaCords[2]
                     && character.dirY > selectedAreaCords[1]
                     && character.dirY + character.spriteWidth < selectedAreaCords[3]) {
-                party.add(character);
-                character.activity = Activity.STAND;
+                if (!party.contains(character)) {
+                    party.add(character);
+                    character.activity = Activity.STAND;
+                }
             }
         }
 
-        if(party != null
-                && x == 0
-                && y == 0) {
-            x = party.get(0).dirX;
-            y = party.get(0).dirY;
-        }
+//        if(party != null
+//                && x == 0
+//                && y == 0) {
+//            x = party.get(0).dirX;
+//            y = party.get(0).dirY;
+//        }
 
     }
 

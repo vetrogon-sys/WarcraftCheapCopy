@@ -1,8 +1,7 @@
 package mainFiles;
 
+import characters.*;
 import characters.Character;
-import characters.ElfArcher;
-import characters.HumanMagician;
 import mainFiles.gameConventions.GameState;
 
 import javax.swing.*;
@@ -51,6 +50,7 @@ public class MyMain extends JPanel implements ActionListener {
 
         characters.add(new ElfArcher(this));
         characters.add(new HumanMagician(this));
+        characters.add(new HumanKnight(this));
     }
 
     public void paint(Graphics g) {
@@ -61,25 +61,42 @@ public class MyMain extends JPanel implements ActionListener {
         if (gameState == GameState.IN_GAME) {
             paintMap(g);
 
-            if (!player.party.isEmpty()) {
-                paintHighlighting((Graphics2D) g);
-            }
             for (Character c : characters) {
                 g.drawImage(c.currentFrame, c.dirX, c.dirY,
                         c.spriteWidth * SCALE, c.spriteHeight * SCALE, null);
             }
 
-
             g.drawImage(new ImageIcon("C:\\myGame\\src\\res\\GameInterface.png").getImage(), 0, 0, null);
+
+            if (!player.party.isEmpty()) {
+                paintHighlighting((Graphics2D) g);
+                paintIco(g);
+            }
+
         }
 
     }
 
     public void paintHighlighting(Graphics2D g) {
-        g.setColor(Color.GREEN);
+        g.setColor(Color.RED);
         for (Character character : player.party) {
             g.drawRect(character.dirX + character.spriteWidth / 4, character.dirY + character.spriteHeight / 4,
                     (int) (character.spriteWidth * 1.5 - 10), (int) (character.spriteHeight * 1.5));
+        }
+    }
+
+    public void paintIco(Graphics g) {
+        int wdFactor = 0;
+        int hgFactor = 0;
+        for (Character character : player.party) {
+            if (wdFactor == 4) {
+                hgFactor++;
+                wdFactor = 0;
+            }
+            g.drawImage(character.icon, (68 + character.iconWidth * SCALE * wdFactor + 6 * wdFactor),
+                    (361 + character.iconHeight * SCALE * hgFactor + 10 * hgFactor),
+                    character.iconWidth * SCALE, character.iconHeight * SCALE, null);
+            wdFactor++;
         }
     }
 

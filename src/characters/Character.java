@@ -27,6 +27,10 @@ public abstract class Character {
     public Image currentFrame;
     public CharacterSprite sprites;
 
+    public Image icon;
+    public int iconWidth = 46;
+    public int iconHeight = 38;
+
     public int spriteWidth;
     public int spriteHeight;
     public float time = 0;
@@ -122,6 +126,7 @@ public abstract class Character {
     public Direction blockedDir() {
         for (Character character : game.characters) {
             if (blockCheck(character) != Direction.NONE) {
+                character.activity = Activity.STAND;
                 return blockCheck(character);
             }
         }
