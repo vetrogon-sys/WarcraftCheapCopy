@@ -4,18 +4,29 @@ import characters.Activity;
 import characters.Character;
 import mainFiles.gameConventions.GameFraction;
 
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Player {
-    private static final int POINT_RANGE = 10;
+    private static final int POINT_RANGE = 40;
+    private static final int MAX_PARTY_SIZE = 12;
+
+    private static final int MAP_STARTED_X = 525;
+    private static final int MAP_STARTED_Y = 32;
+    private static final int INTERFACE_X_SIZE = 1354;
+    private static final int INTERFACE_Y_SIZE = 1022;
+    private static final int MAP_MOVE_SPED = 20;
 
     public MyMain game;
     public int x;
     public int y;
 
-    public GameFraction fraction = GameFraction.HUMANS;
+    public int mapX = MAP_STARTED_X;
+    public int mapY = MAP_STARTED_Y;
+
+    public GameFraction fraction = GameFraction.ORC;
 
     int[] selectedAreaCords = new int[4];
 
@@ -25,14 +36,48 @@ public class Player {
         this.game = game;
     }
 
+    public void keyPressed(KeyEvent e) {
+        int key = e.getKeyCode();
+
+        if (key == KeyEvent.VK_DOWN
+                && mapY >= MAP_STARTED_Y + INTERFACE_Y_SIZE - game.mainMap.getHeight(null)) {
+            mapY -= MAP_MOVE_SPED;
+            for (Character character : game.characters) {
+                character.dirY -= MAP_MOVE_SPED;
+            }
+        } else if (key == KeyEvent.VK_UP
+                && mapY <= MAP_STARTED_Y - POINT_RANGE / 2) {
+            mapY += MAP_MOVE_SPED;
+            for (Character character : game.characters) {
+                character.dirY += MAP_MOVE_SPED;
+            }
+        } else if (key == KeyEvent.VK_RIGHT
+                && mapX >= MAP_STARTED_X + INTERFACE_X_SIZE - game.mainMap.getWidth(null)) {
+            mapX -= MAP_MOVE_SPED;
+            for (Character character : game.characters) {
+                character.dirX -= MAP_MOVE_SPED;
+            }
+        } else if (key == KeyEvent.VK_LEFT
+                && mapX <= MAP_STARTED_X - POINT_RANGE / 2) {
+            mapX += MAP_MOVE_SPED;
+            for (Character character : game.characters) {
+                character.dirX += MAP_MOVE_SPED;
+            }
+        }
+
+    }
+
     public void mouseClicked(MouseEvent e) {
         int key = e.getButton();
         if (key == MouseEvent.BUTTON1) {
-            if(!party.isEmpty()) {
+            if (!party.isEmpty()) {
                 x = e.getX();
                 y = e.getY();
                 setPartyDirection();
             }
+        }
+        if (key == MouseEvent.BUTTON2) {
+            party.removeAll(party);
         }
     }
 
@@ -98,19 +143,14 @@ public class Player {
                     && character.dirX + character.spriteWidth < selectedAreaCords[2]
                     && character.dirY > selectedAreaCords[1]
                     && character.dirY + character.spriteWidth < selectedAreaCords[3]) {
-                if (!party.contains(character)) {
+                if (!party.contains(character)
+                        && party.size() < MAX_PARTY_SIZE
+                        && character.fraction == fraction) {
                     party.add(character);
                     character.activity = Activity.STAND;
                 }
             }
         }
-
-//        if(party != null
-//                && x == 0
-//                && y == 0) {
-//            x = party.get(0).dirX;
-//            y = party.get(0).dirY;
-//        }
 
     }
 

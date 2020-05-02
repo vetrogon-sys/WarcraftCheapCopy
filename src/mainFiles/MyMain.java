@@ -6,10 +6,7 @@ import mainFiles.gameConventions.GameState;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 
 public class MyMain extends JPanel implements ActionListener {
@@ -20,6 +17,8 @@ public class MyMain extends JPanel implements ActionListener {
 
     GameState gameState;
     public MainMenu menu;
+
+    public Image mainMap = new ImageIcon("C:\\myGame\\src\\res\\map.jpg").getImage();
 
     public java.util.List<Character> characters = new ArrayList<>();
     public Player player;
@@ -48,9 +47,24 @@ public class MyMain extends JPanel implements ActionListener {
             }
         });
 
+        frame.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                player.keyPressed(e);
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyReleased(e);
+            }
+        });
+
         characters.add(new ElfArcher(this));
         characters.add(new HumanMagician(this));
         characters.add(new HumanKnight(this));
+
+        characters.add(new Troll(this));
+        characters.add(new OrcGrant(this));
     }
 
     public void paint(Graphics g) {
@@ -59,7 +73,8 @@ public class MyMain extends JPanel implements ActionListener {
             menu.clickCheck();
         }
         if (gameState == GameState.IN_GAME) {
-            paintMap(g);
+            g.drawImage(mainMap, player.mapX, player.mapY,
+                    mainMap.getWidth(null), mainMap.getHeight(null), null);
 
             for (Character c : characters) {
                 g.drawImage(c.currentFrame, c.dirX, c.dirY,
@@ -67,6 +82,7 @@ public class MyMain extends JPanel implements ActionListener {
             }
 
             g.drawImage(new ImageIcon("C:\\myGame\\src\\res\\GameInterface.png").getImage(), 0, 0, null);
+            g.drawImage(mainMap, 62, 53, 398, 300, null);
 
             if (!player.party.isEmpty()) {
                 paintHighlighting((Graphics2D) g);
@@ -78,7 +94,7 @@ public class MyMain extends JPanel implements ActionListener {
     }
 
     public void paintHighlighting(Graphics2D g) {
-        g.setColor(Color.RED);
+        g.setColor(Color.GREEN);
         for (Character character : player.party) {
             g.drawRect(character.dirX + character.spriteWidth / 4, character.dirY + character.spriteHeight / 4,
                     (int) (character.spriteWidth * 1.5 - 10), (int) (character.spriteHeight * 1.5));
@@ -100,15 +116,13 @@ public class MyMain extends JPanel implements ActionListener {
         }
     }
 
-    public void paintMap(Graphics g) {
-        g.drawImage(new ImageIcon("C:\\myGame\\src\\res\\map.png").getImage(), 525, 32, 1920, 1080, null);
-        g.drawImage(new ImageIcon("C:\\myGame\\src\\res\\map.png").getImage(), 62, 53, 398, 300, null);
-    }
-
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        for (Character c : characters) {
-            c.move();
+        if (characters != null) {
+            for (Character c : characters) {
+                c.walkDirection();
+                c.move();
+            }
         }
         repaint();
     }

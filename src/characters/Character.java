@@ -5,12 +5,15 @@ import mainFiles.gameConventions.GameFraction;
 import mainFiles.MyMain;
 
 import java.awt.*;
+import java.util.Random;
 
 import static mainFiles.Direction.*;
 
 public abstract class Character {
     private static final int SIZE_DIF = 12;
-    public static GameFraction fraction;
+    public GameFraction fraction;
+
+    private int count = 0;
 
     public MyMain game;
 
@@ -81,7 +84,8 @@ public abstract class Character {
                 currentFrame = sprites.characterSprites.get(direction).get(activity)[(int) time];
             }
         }
-        if (state == State.ALIVE && activity == Activity.STAND) {
+        if (state == State.ALIVE && activity == Activity.STAND
+                || direction == blockedDir) {
             currentFrame = sprites.characterSprites.get(direction).get(activity)[0];
         }
 
@@ -123,6 +127,22 @@ public abstract class Character {
         }
     }
 
+    public void walkDirection() {
+        if (state == State.ALIVE
+                && !game.player.party.contains(this)) {
+            activity = Activity.WALK;
+            Direction rDir = direction;
+            if (count > 40
+                    || rDir == blockedDir()) {
+                rDir = getRandomDirection();
+                count = 0;
+            }
+            direction = rDir;
+
+            count += 1f;
+        }
+    }
+
     public Direction blockedDir() {
         for (Character character : game.characters) {
             if (blockCheck(character) != Direction.NONE) {
@@ -139,40 +159,48 @@ public abstract class Character {
                     && dirX < obj.dirX
                     && (dirY >= obj.dirY && dirY <= obj.dirY + obj.spriteHeight
                     || dirY + spriteHeight >= obj.dirY && dirY + spriteHeight <= obj.dirY + obj.spriteHeight
-                    || dirY < obj.dirY && dirY + spriteHeight > obj.dirY + obj.spriteHeight)) {
+                    || dirY < obj.dirY && dirY + spriteHeight > obj.dirY + obj.spriteHeight)
+                    || dirX + spriteWidth >= game.mainMap.getWidth(null)) {
                 return Direction.RIGHT;
             }
             if (dirX <= obj.dirX + obj.spriteWidth + SIZE_DIF
                     && dirX + spriteWidth > obj.dirX
                     && (dirY >= obj.dirY && dirY <= obj.dirY + obj.spriteHeight
                     || dirY + spriteHeight >= obj.dirY && dirY + spriteHeight <= obj.dirY + obj.spriteHeight
-                    || dirY < obj.dirY && dirY + spriteHeight > obj.dirY + obj.spriteHeight)) {
+                    || dirY < obj.dirY && dirY + spriteHeight > obj.dirY + obj.spriteHeight)
+                    || dirX <= 525) {
                 return Direction.LEFT;
             }
             if (dirY <= obj.dirY + obj.spriteHeight + SIZE_DIF * 2
                     && dirY + spriteHeight > obj.dirY + obj.spriteHeight
                     && (dirX >= obj.dirX && dirX <= obj.dirX + obj.spriteWidth
                     || dirX + spriteWidth >= obj.dirX && dirX + spriteWidth <= obj.dirX + obj.spriteWidth
-                    || dirX < obj.dirX && dirX + spriteWidth > obj.dirX + obj.spriteWidth)) {
+                    || dirX < obj.dirX && dirX + spriteWidth > obj.dirX + obj.spriteWidth)
+                    || dirY <= 32) {
                 return Direction.UP;
             }
             if (dirY + spriteHeight + SIZE_DIF * 2 >= obj.dirY
                     && dirY - spriteHeight < obj.dirY
                     && (dirX >= obj.dirX && dirX <= obj.dirX + obj.spriteWidth
                     || dirX + spriteWidth >= obj.dirX && dirX + spriteWidth <= obj.dirX + obj.spriteWidth
-                    || dirX < obj.dirX && dirX + spriteWidth > obj.dirX + obj.spriteWidth)) {
+                    || dirX < obj.dirX && dirX + spriteWidth > obj.dirX + obj.spriteWidth)
+                    || dirY + spriteHeight >= game.mainMap.getHeight(null)) {
                 return Direction.DOWN;
             }
-            if(dirX + spriteWidth >= obj.dirX && dirY > obj.dirY && dirY < obj.dirY + obj.spriteHeight) {
+            if (dirX + spriteWidth >= obj.dirX && dirY > obj.dirY && dirY < obj.dirY + obj.spriteHeight
+                    || dirX + spriteWidth >= game.mainMap.getWidth(null) || dirY <= 32) {
                 return RIGHT_UP;
             }
-            if(dirX + spriteWidth >= obj.dirX && dirY + spriteWidth > obj.dirY && dirY + spriteWidth < obj.dirY + obj.spriteHeight) {
+            if (dirX + spriteWidth >= obj.dirX && dirY + spriteWidth > obj.dirY && dirY + spriteWidth < obj.dirY + obj.spriteHeight
+                    || dirX + spriteWidth >= game.mainMap.getWidth(null) || dirY + spriteHeight >= game.mainMap.getHeight(null)) {
                 return RIGHT_DOWN;
             }
-            if(dirX <= obj.dirX && dirY > obj.dirY && dirY < obj.dirY + obj.spriteHeight) {
+            if (dirX <= obj.dirX && dirY > obj.dirY && dirY < obj.dirY + obj.spriteHeight
+                    || dirX <= 525 || dirY <= 32) {
                 return LEFT_UP;
             }
-            if(dirX <= obj.dirX && dirY + spriteWidth > obj.dirY && dirY + spriteWidth < obj.dirY + obj.spriteHeight) {
+            if (dirX <= obj.dirX && dirY + spriteWidth > obj.dirY && dirY + spriteWidth < obj.dirY + obj.spriteHeight
+                    || dirX <= 525 || dirY + spriteHeight >= game.mainMap.getHeight(null)) {
                 return LEFT_DOWN;
             }
             return Direction.NONE;
@@ -189,6 +217,16 @@ public abstract class Character {
             activity = Activity.WALK;
             return false;
         }
+    }
+
+    public Direction getRandomDirection() {
+        Direction[] directions = Direction.values();
+        Random r = new Random();
+        Direction rDir = directions[r.nextInt(values().length)];
+        while (rDir == NONE) {
+            rDir = directions[r.nextInt(values().length)];
+        }
+        return rDir;
     }
 
 }
