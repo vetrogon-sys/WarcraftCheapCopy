@@ -42,24 +42,32 @@ public class Player {
         if (key == KeyEvent.VK_DOWN
                 && mapY >= MAP_STARTED_Y + INTERFACE_Y_SIZE - game.mainMap.getHeight(null)) {
             mapY -= MAP_MOVE_SPED;
+            game.miniMap.rectY += 1.21;
+
             for (Character character : game.characters) {
                 character.dirY -= MAP_MOVE_SPED;
             }
         } else if (key == KeyEvent.VK_UP
                 && mapY <= MAP_STARTED_Y - POINT_RANGE / 2) {
             mapY += MAP_MOVE_SPED;
+            game.miniMap.rectY -= 1.21;
+
             for (Character character : game.characters) {
                 character.dirY += MAP_MOVE_SPED;
             }
         } else if (key == KeyEvent.VK_RIGHT
                 && mapX >= MAP_STARTED_X + INTERFACE_X_SIZE - game.mainMap.getWidth(null)) {
             mapX -= MAP_MOVE_SPED;
+            game.miniMap.rectX += 1.62;
+
             for (Character character : game.characters) {
                 character.dirX -= MAP_MOVE_SPED;
             }
         } else if (key == KeyEvent.VK_LEFT
                 && mapX <= MAP_STARTED_X - POINT_RANGE / 2) {
             mapX += MAP_MOVE_SPED;
+            game.miniMap.rectX -= 1.62;
+
             for (Character character : game.characters) {
                 character.dirX += MAP_MOVE_SPED;
             }

@@ -19,6 +19,7 @@ public class MyMain extends JPanel implements ActionListener {
     public MainMenu menu;
 
     public Image mainMap = new ImageIcon("C:\\myGame\\src\\res\\map.jpg").getImage();
+    public MiniMap miniMap;
 
     public java.util.List<Character> characters = new ArrayList<>();
     public Player player;
@@ -27,8 +28,10 @@ public class MyMain extends JPanel implements ActionListener {
         this.frame = frame;
         this.timer.start();
         this.gameState = GameState.IN_GAME;
+
         this.menu = new MainMenu(this);
         this.player = new Player(this);
+        this.miniMap = new MiniMap(mainMap);
 
         frame.addMouseListener(new MouseAdapter() {
             @Override
@@ -82,7 +85,7 @@ public class MyMain extends JPanel implements ActionListener {
             }
 
             g.drawImage(new ImageIcon("C:\\myGame\\src\\res\\GameInterface.png").getImage(), 0, 0, null);
-            g.drawImage(mainMap, 62, 53, 398, 300, null);
+            miniMap.paintMiniMap(g);
 
             if (!player.party.isEmpty()) {
                 paintHighlighting((Graphics2D) g);
@@ -120,7 +123,7 @@ public class MyMain extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         if (characters != null) {
             for (Character c : characters) {
-                c.walkDirection();
+//                c.walkDirection();
                 c.move();
             }
         }
