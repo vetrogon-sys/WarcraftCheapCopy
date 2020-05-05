@@ -47,6 +47,13 @@ public abstract class Character {
     public void move() throws NullPointerException {
         Direction blockedDir = blockedDir();
 
+        if (hp <= 0) {
+            activity = Activity.DIE;
+            state = State.DEAD;
+
+            game.player.party.remove(this);
+        }
+
         if (fraction == game.player.fraction
                 && game.player.party.contains(this)) {
             isOnPlace();
@@ -63,30 +70,23 @@ public abstract class Character {
 
             currentFrame = sprites.characterSprites.get(direction).get(activity)[(int) time];
         }
-        if (state == State.ALIVE
-                && activity == Activity.ATTACK) {
-            if (time <= 3.8) {
-                currentFrame = sprites.characterSprites.get(direction).get(activity)[(int) time];
-                time += 0.25f;
-            } else {
-                activity = Activity.STAND;
+        if (activity == Activity.ATTACK
+                && state == State.ALIVE) {
+            if (time >= 2.8) {
                 time = 0;
+                stan();
             }
+            time += 0.198f;
 
+            currentFrame = sprites.characterSprites.get(direction).get(Activity.ATTACK)[2];
         }
         if (state == State.DEAD) {
-            if (activity == Activity.DIE) {
-                time += 0.25f;
-                if (time >= 1.75) {
-                    activity = Activity.STAND;
-                    time = 2;
-                }
-                currentFrame = sprites.characterSprites.get(direction).get(activity)[(int) time];
-            }
+            currentFrame = sprites.characterSprites.get(direction).get(Activity.DIE)[2];
         }
         if (state == State.ALIVE && activity == Activity.STAND
                 || direction == blockedDir) {
             currentFrame = sprites.characterSprites.get(direction).get(activity)[0];
+            stan();
         }
 
         if (state == State.ALIVE
@@ -97,33 +97,40 @@ public abstract class Character {
                     dirY -= speed;
                     break;
                 case RIGHT_UP:
-                    dirX += (int) (speed / 1.5);
-                    dirY -= (int) (speed / 1.5);
+                    dirX += (int) Math.ceil(speed / 1.5);
+                    dirY -= (int) Math.ceil(speed / 1.5);
                     break;
                 case RIGHT:
                     dirX += speed;
                     break;
                 case RIGHT_DOWN:
-                    dirX += (int) (speed / 1.5);
-                    dirY += (int) (speed / 1.5);
+                    dirX += (int) Math.ceil(speed / 1.5);
+                    dirY += (int) Math.ceil(speed / 1.5);
                     break;
                 case DOWN:
                     dirY += speed;
                     break;
                 case LEFT_DOWN:
-                    dirX -= (int) (speed / 1.5);
-                    dirY += (int) (speed / 1.5);
+                    dirX -= (int) Math.ceil(speed / 1.5);
+                    dirY += (int) Math.ceil(speed / 1.5);
                     break;
                 case LEFT:
                     dirX -= speed;
                     break;
                 case LEFT_UP:
-                    dirX -= (int) (speed / 1.5);
-                    dirY -= (int) (speed / 1.5);
+                    dirX -= (int) Math.ceil(speed / 1.5);
+                    dirY -= (int) Math.ceil(speed / 1.5);
                     break;
                 default:
                     break;
             }
+        }
+    }
+
+    public void stan() {
+        final Direction oldDir = direction;
+        for (float i = 0; i < 5; i += 0.2f) {
+            currentFrame = sprites.characterSprites.get(oldDir).get(activity)[activity.number - 1];
         }
     }
 
@@ -211,7 +218,9 @@ public abstract class Character {
     public boolean isOnPlace() {
         if (dirX < game.player.x && dirX + spriteWidth > game.player.x
                 && dirY < game.player.y && dirY + spriteHeight > game.player.y) {
-            activity = Activity.STAND;
+            if (activity != Activity.ATTACK) {
+                activity = Activity.STAND;
+            }
             return true;
         } else {
             activity = Activity.WALK;
@@ -219,13 +228,15 @@ public abstract class Character {
         }
     }
 
+    public abstract void attack(Character target);
+
     public Direction getRandomDirection() {
         Direction[] directions = Direction.values();
         Random r = new Random();
-        Direction rDir = directions[r.nextInt(values().length)];
-        while (rDir == NONE) {
+        Direction rDir;
+        do {
             rDir = directions[r.nextInt(values().length)];
-        }
+        } while (rDir == NONE);
         return rDir;
     }
 

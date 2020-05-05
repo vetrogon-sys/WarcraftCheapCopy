@@ -1,5 +1,7 @@
-package characters;
+package characters.successors;
 
+import characters.Character;
+import characters.CharacterSprite;
 import mainFiles.MyMain;
 import mainFiles.gameConventions.GameFraction;
 
@@ -26,5 +28,10 @@ public class OrcGrant extends Character {
 
 //        dirX = 1000;
 //        dirY = 500;
+    }
+
+    @Override
+    public void attack(Character target) {
+
     }
 }

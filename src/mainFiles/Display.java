@@ -3,6 +3,7 @@ package mainFiles;
 import javax.swing.*;
 
 public class Display {
+
     public static void main(String[] args) {
         JFrame frame = new JFrame("Name");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -12,9 +13,11 @@ public class Display {
         frame.setResizable(false);
         frame.setUndecorated(true);
 
-        frame.add(new MyMain(frame));
+        MyMain game = new MyMain(frame);
 
+        frame.add(game);
 
         frame.setVisible(true);
     }
+
 }

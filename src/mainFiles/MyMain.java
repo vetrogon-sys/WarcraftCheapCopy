@@ -1,13 +1,15 @@
 package mainFiles;
 
-import characters.*;
 import characters.Character;
+import characters.successors.*;
 import mainFiles.gameConventions.GameState;
+import supply.Supply;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 
 public class MyMain extends JPanel implements ActionListener {
     private static final int SCALE = 2;
@@ -16,12 +18,12 @@ public class MyMain extends JPanel implements ActionListener {
     public Timer timer = new Timer(20, this);
 
     GameState gameState;
-    public MainMenu menu;
 
     public Image mainMap = new ImageIcon("C:\\myGame\\src\\res\\map.jpg").getImage();
     public MiniMap miniMap;
 
     public java.util.List<Character> characters = new ArrayList<>();
+    public java.util.List<Supply> supplies = new ArrayList<>();
     public Player player;
 
     public MyMain(JFrame frame) {
@@ -29,7 +31,6 @@ public class MyMain extends JPanel implements ActionListener {
         this.timer.start();
         this.gameState = GameState.IN_GAME;
 
-        this.menu = new MainMenu(this);
         this.player = new Player(this);
         this.miniMap = new MiniMap(mainMap);
 
@@ -49,7 +50,6 @@ public class MyMain extends JPanel implements ActionListener {
                 player.mouseReleased(e);
             }
         });
-
         frame.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -71,10 +71,6 @@ public class MyMain extends JPanel implements ActionListener {
     }
 
     public void paint(Graphics g) {
-        if (gameState == GameState.IN_MENU) {
-            menu.drawMenu(g);
-            menu.clickCheck();
-        }
         if (gameState == GameState.IN_GAME) {
             g.drawImage(mainMap, player.mapX, player.mapY,
                     mainMap.getWidth(null), mainMap.getHeight(null), null);
@@ -82,16 +78,24 @@ public class MyMain extends JPanel implements ActionListener {
             for (Character c : characters) {
                 g.drawImage(c.currentFrame, c.dirX, c.dirY,
                         c.spriteWidth * SCALE, c.spriteHeight * SCALE, null);
+
+                if (!player.party.isEmpty()) {
+                    paintHighlighting((Graphics2D) g);
+                }
+            }
+
+            if (!supplies.isEmpty()) {
+                for (Supply supply : supplies) {
+                    g.drawImage(supply.currentFrame, supply.dirX, supply.dirY,
+                            supply.width * SCALE, supply.height * SCALE, null);
+                }
             }
 
             g.drawImage(new ImageIcon("C:\\myGame\\src\\res\\GameInterface.png").getImage(), 0, 0, null);
-            miniMap.paintMiniMap(g);
-
             if (!player.party.isEmpty()) {
-                paintHighlighting((Graphics2D) g);
                 paintIco(g);
             }
-
+            miniMap.paintMiniMap(g);
         }
 
     }
@@ -123,10 +127,22 @@ public class MyMain extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
         if (characters != null) {
             for (Character c : characters) {
-//                c.walkDirection();
+                if (!player.party.contains(c)) {
+                    c.walkDirection();
+                }
                 c.move();
             }
         }
+
+        if (!supplies.isEmpty()) {
+            for (Supply supply : supplies) {
+                try {
+                    supply.move();
+                } catch (ConcurrentModificationException ignored) {
+                }
+            }
+        }
+
         repaint();
     }
 

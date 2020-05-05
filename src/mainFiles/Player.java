@@ -2,6 +2,7 @@ package mainFiles;
 
 import characters.Activity;
 import characters.Character;
+import characters.State;
 import mainFiles.gameConventions.GameFraction;
 
 import java.awt.event.KeyEvent;
@@ -26,11 +27,12 @@ public class Player {
     public int mapX = MAP_STARTED_X;
     public int mapY = MAP_STARTED_Y;
 
-    public GameFraction fraction = GameFraction.ORC;
+    public GameFraction fraction = GameFraction.HUMANS;
 
     int[] selectedAreaCords = new int[4];
 
     public List<Character> party = new ArrayList<>();
+    public Character target;
 
     public Player(MyMain game) {
         this.game = game;
@@ -71,6 +73,12 @@ public class Player {
             for (Character character : game.characters) {
                 character.dirX += MAP_MOVE_SPED;
             }
+        } else if (key == KeyEvent.VK_L) {
+            target = game.characters.get(1);
+            for (Character c : party) {
+                c.activity = Activity.ATTACK;
+                c.attack(target);
+            }
         }
 
     }
@@ -78,7 +86,14 @@ public class Player {
     public void mouseClicked(MouseEvent e) {
         int key = e.getButton();
         if (key == MouseEvent.BUTTON1) {
-            if (!party.isEmpty()) {
+            if (!party.isEmpty() && isTargetDirection(e.getX(), e.getY())) {
+                for (Character character : party) {
+                    if (target.hp > 0) {
+                        character.activity = Activity.ATTACK;
+                        character.attack(target);
+                    }
+                }
+            }else if (!party.isEmpty()) {
                 x = e.getX();
                 y = e.getY();
                 setPartyDirection();
@@ -89,10 +104,27 @@ public class Player {
         }
     }
 
+    private boolean isTargetDirection(int xCords, int yCords) {
+        for (Character character : game.characters) {
+            if (!party.contains(character)) {
+                if (character.dirX < xCords
+                        && character.dirX + character.spriteWidth > xCords
+                        && character.dirY < yCords
+                        && character.dirY + character.spriteHeight > yCords) {
+                    target = character;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     private void setPartyDirection() {
         if (!party.isEmpty()) {
             for (Character character : party) {
-                changeDirection(character);
+                if (character.state == State.ALIVE) {
+                    changeDirection(character);
+                }
             }
         }
     }

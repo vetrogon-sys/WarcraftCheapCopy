@@ -35,6 +35,25 @@ public class CharacterSprite {
     }
 
 //    private void setSprites() {
+//        for (Direction direction : Direction.values()) {
+//            if (!direction.equals(Direction.NONE)) {
+//                characterSprites.put(direction, null);
+//                for (Activity activity: Activity.values()) {
+//                    Map<Activity, Image[]> activityMap = new HashMap<>();
+//                    Image[] tmp = new Image[activity.number];
+//                    for (int i = 0; i < tmp.length; i++) {
+//                        tmp[i] = characterImage.getSubimage((i + activity.start) * width, direction.count * height,
+//                                width, height)
+//                                .getScaledInstance(width, height, Image.SCALE_SMOOTH);
+//                    }
+//                    activityMap.put(activity, tmp);
+//                    characterSprites.put(direction, activityMap);
+//                }
+//            }
+//        }
+//    }
+
+//    private void setSprites() {
 //        for (Direction dir : Direction.values()) {
 //            if (dir != Direction.NONE) {
 //                for (Activity activity : Activity.values()) {
@@ -55,10 +74,12 @@ public class CharacterSprite {
 
     private void setActivity() {
         for (Direction dir : Direction.values()) {
-            for (Activity activity : Activity.values()) {
-                Map<Activity, Image[]> tmp = new HashMap<>();
-                tmp.put(activity, new Image[activity.number]);
-                characterSprites.put(dir, tmp);
+            if (dir != Direction.NONE) {
+                for (Activity activity : Activity.values()) {
+                    Map<Activity, Image[]> tmp = new HashMap<>();
+                    tmp.put(activity, new Image[activity.number]);
+                    characterSprites.put(dir, tmp);
+                }
             }
         }
     }
@@ -69,8 +90,8 @@ public class CharacterSprite {
             if (dir != Direction.NONE) {
                 for (Activity activity : Activity.values()) {
                     Image[] tmp = new Image[activity.number];
-                    for (int i = activity.start; i < activity.number; i++) {
-                        tmp[i] = characterImage.getSubimage(i * width, dir.count * height,
+                    for (int i = 0; i < activity.number; i++) {
+                        tmp[i] = characterImage.getSubimage((i + activity.start) * width, dir.count * height,
                                 width, height)
                                 .getScaledInstance(width, height, Image.SCALE_SMOOTH);
                     }

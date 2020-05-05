@@ -1,5 +1,7 @@
-package characters;
+package characters.successors;
 
+import characters.Character;
+import characters.CharacterSprite;
 import mainFiles.MyMain;
 import mainFiles.gameConventions.GameFraction;
 
@@ -23,5 +25,12 @@ public class HumanKnight extends Character {
 
         dirX = (int) (Math.random() * 1000) + 700;
         dirY = (int) (Math.random() * 500) + 50;
+
+
+    }
+
+    @Override
+    public void attack(Character target) {
+
     }
 }
